@@ -1,0 +1,498 @@
+diff --git a/arch/arm64/boot/dts/freescale/fsl-imx8mm-evk.dts b/arch/arm64/boot/dts/freescale/fsl-imx8mm-evk.dts
+index 57de82e..7b933d5 100755
+--- a/arch/arm64/boot/dts/freescale/fsl-imx8mm-evk.dts
++++ b/arch/arm64/boot/dts/freescale/fsl-imx8mm-evk.dts
+@@ -52,6 +52,18 @@
+ 		pinctrl-0 = <&pinctrl_ir_recv>;
+ 	};
+ 
++    reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		m4_reserved: m4@0x80000000 {
++			no-map;
++			reg = <0 0x80000000 0 0x1000000>;
++		};
++
++	};
++
+ 	regulators {
+ 		compatible = "simple-bus";
+ 		#address-cells = <1>;
+@@ -94,6 +106,7 @@
+ 		clocks = <&clk IMX8MM_CLK_SAI3_ROOT>;
+ 		clock-names = "mclk";
+ 		wlf,mute-gpios = <&gpio5 21 GPIO_ACTIVE_LOW>;
++		status = "disabled";
+ 	};
+ 
+ 	sound-wm8524 {
+@@ -104,6 +117,7 @@
+ 		audio-routing =
+ 			"Line Out Jack", "LINEVOUTL",
+ 			"Line Out Jack", "LINEVOUTR";
++		status="disabled";
+ 	};
+ 
+ 	sound-ak4458 {
+@@ -112,6 +126,7 @@
+ 		audio-cpu = <&sai1>;
+ 		audio-codec = <&ak4458_1>, <&ak4458_2>;
+ 		ak4458,pdn-gpio = <&pca6416 4 GPIO_ACTIVE_HIGH>;
++		status = "disabled";
+ 	};
+ 
+ 	sound-ak5558 {
+@@ -150,6 +165,28 @@
+ 	assigned-clock-rates = <786432000>, <722534400>;
+ };
+ 
++&rpmsg{
++	/*
++	 * 64K for one rpmsg instance:
++	 * --0xb8000000~0xb800ffff: pingpong
++	 */
++	vdev-nums = <1>;
++	reg = <0x0 0xb8000000 0x0 0x10000>;
++	status = "okay";
++};
++
++&gpio5 {
++	status = "disabled";
++};
++
++&i2c4 {
++	status = "disabled";
++};
++
++&uart4 {
++	status = "disabled";
++};
++
+ &iomuxc {
+ 	pinctrl-names = "default";
+ 
+@@ -855,7 +892,7 @@
+ 	fsl,sai-multi-lane;
+ 	fsl,dataline,dsd = <0 0xff 0xff 2 0xff 0x11>;
+ 	dmas = <&sdma2 0 26 0>, <&sdma2 1 26 0>;
+-	status = "okay";
++	status = "disabled";
+ };
+ 
+ &sai3 {
+@@ -865,7 +902,7 @@
+ 			<&clk IMX8MM_CLK_SAI3_DIV>;
+ 	assigned-clock-parents = <&clk IMX8MM_AUDIO_PLL1_OUT>;
+ 	assigned-clock-rates = <0>, <24576000>;
+-	status = "okay";
++	status = "disabled";
+ };
+ 
+ &sai5 {
+@@ -899,7 +936,7 @@
+ 		<&clk IMX8MM_AUDIO_PLL1_OUT>, <&clk IMX8MM_AUDIO_PLL2_OUT>;
+ 	clock-names = "core", "rxtx0", "rxtx1", "rxtx2", "rxtx3",
+ 		"rxtx4", "rxtx5", "rxtx6", "rxtx7", "spba", "pll8k", "pll11k";
+-	status = "okay";
++	status = "disabled";
+ };
+ 
+ &fec1 {
+diff --git a/arch/arm64/boot/dts/freescale/fsl-imx8mm.dtsi b/arch/arm64/boot/dts/freescale/fsl-imx8mm.dtsi
+index e200219..e246998 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-imx8mm.dtsi
++++ b/arch/arm64/boot/dts/freescale/fsl-imx8mm.dtsi
+@@ -88,6 +88,12 @@
+ 			no-map;
+ 			reg = <0 0xb8000000 0 0x400000>;
+ 		};
++
++                sai_reserved: sai@0x80000000 {
++                        no-map;
++                        reg = <0 0x80000000 0 0x1000000>;
++                };
++
+ 	};
+ 
+ 	gic: interrupt-controller@38800000 {
+diff --git a/drivers/clk/imx/clk-imx8mm.c b/drivers/clk/imx/clk-imx8mm.c
+index 5709bfc..105b892 100644
+--- a/drivers/clk/imx/clk-imx8mm.c
++++ b/drivers/clk/imx/clk-imx8mm.c
+@@ -450,8 +450,8 @@ static void __init imx8mm_clocks_init(struct device_node *ccm_node)
+ 	base = of_iomap(np, 0);
+ 	WARN_ON(!base);
+ 
+-	clks[IMX8MM_AUDIO_PLL1_REF_SEL] = imx_clk_mux("audio_pll1_ref_sel", base + 0x0, 0, 2, pll_ref_sels, ARRAY_SIZE(pll_ref_sels));
+-	clks[IMX8MM_AUDIO_PLL2_REF_SEL] = imx_clk_mux("audio_pll2_ref_sel", base + 0x14, 0, 2, pll_ref_sels, ARRAY_SIZE(pll_ref_sels));
++//	clks[IMX8MM_AUDIO_PLL1_REF_SEL] = imx_clk_mux("audio_pll1_ref_sel", base + 0x0, 0, 2, pll_ref_sels, ARRAY_SIZE(pll_ref_sels));
++//	clks[IMX8MM_AUDIO_PLL2_REF_SEL] = imx_clk_mux("audio_pll2_ref_sel", base + 0x14, 0, 2, pll_ref_sels, ARRAY_SIZE(pll_ref_sels));
+ 	clks[IMX8MM_VIDEO_PLL1_REF_SEL] = imx_clk_mux("video_pll1_ref_sel", base + 0x28, 0, 2, pll_ref_sels, ARRAY_SIZE(pll_ref_sels));
+ 	clks[IMX8MM_DRAM_PLL_REF_SEL] = imx_clk_mux("dram_pll_ref_sel", base + 0x50, 0, 2, pll_ref_sels, ARRAY_SIZE(pll_ref_sels));
+ 	clks[IMX8MM_GPU_PLL_REF_SEL] = imx_clk_mux("gpu_pll_ref_sel", base + 0x64, 0, 2, pll_ref_sels, ARRAY_SIZE(pll_ref_sels));
+@@ -461,8 +461,8 @@ static void __init imx8mm_clocks_init(struct device_node *ccm_node)
+ 	clks[IMX8MM_SYS_PLL2_REF_SEL] = imx_clk_mux("sys_pll2_ref_sel", base + 0x104, 0, 2, pll_ref_sels, ARRAY_SIZE(pll_ref_sels));
+ 	clks[IMX8MM_SYS_PLL3_REF_SEL] = imx_clk_mux("sys_pll3_ref_sel", base + 0x114, 0, 2, pll_ref_sels, ARRAY_SIZE(pll_ref_sels));
+ 
+-	clks[IMX8MM_AUDIO_PLL1] = imx_clk_int_pll("audio_pll1", "audio_pll1_ref_sel", base, &imx8mm_audio_pll);
+-	clks[IMX8MM_AUDIO_PLL2] = imx_clk_int_pll("audio_pll2", "audio_pll2_ref_sel", base + 0x14, &imx8mm_audio_pll);
++//	clks[IMX8MM_AUDIO_PLL1] = imx_clk_int_pll("audio_pll1", "audio_pll1_ref_sel", base, &imx8mm_audio_pll);
++//	clks[IMX8MM_AUDIO_PLL2] = imx_clk_int_pll("audio_pll2", "audio_pll2_ref_sel", base + 0x14, &imx8mm_audio_pll);
+ 	clks[IMX8MM_VIDEO_PLL1] = imx_clk_int_pll("video_pll1", "video_pll1_ref_sel", base + 0x28, &imx8mm_video_pll);
+ 	clks[IMX8MM_DRAM_PLL] = imx_clk_int_pll("dram_pll", "dram_pll_ref_sel", base + 0x50, &imx8mm_dram_pll);
+ 	clks[IMX8MM_GPU_PLL] = imx_clk_int_pll("gpu_pll", "gpu_pll_ref_sel", base + 0x64, &imx8mm_gpu_pll);
+@@ -473,8 +473,8 @@ static void __init imx8mm_clocks_init(struct device_node *ccm_node)
+ 	clks[IMX8MM_SYS_PLL3] = imx_clk_int_pll("sys_pll3", "sys_pll3_ref_sel", base + 0x114, &imx8mm_sys_pll);
+ 
+ 	/* PLL bypass out */
+-	clks[IMX8MM_AUDIO_PLL1_BYPASS] = imx_clk_mux_flags("audio_pll1_bypass", base, 4, 1, audio_pll1_bypass_sels, ARRAY_SIZE(audio_pll1_bypass_sels), CLK_SET_RATE_PARENT);
+-	clks[IMX8MM_AUDIO_PLL2_BYPASS] = imx_clk_mux_flags("audio_pll2_bypass", base + 0x14, 4, 1, audio_pll2_bypass_sels, ARRAY_SIZE(audio_pll2_bypass_sels), CLK_SET_RATE_PARENT);
++//	clks[IMX8MM_AUDIO_PLL1_BYPASS] = imx_clk_mux_flags("audio_pll1_bypass", base, 4, 1, audio_pll1_bypass_sels, ARRAY_SIZE(audio_pll1_bypass_sels), CLK_SET_RATE_PARENT);
++//	clks[IMX8MM_AUDIO_PLL2_BYPASS] = imx_clk_mux_flags("audio_pll2_bypass", base + 0x14, 4, 1, audio_pll2_bypass_sels, ARRAY_SIZE(audio_pll2_bypass_sels), CLK_SET_RATE_PARENT);
+ 	clks[IMX8MM_VIDEO_PLL1_BYPASS] = imx_clk_mux_flags("video_pll1_bypass", base + 0x28, 4, 1, video_pll1_bypass_sels, ARRAY_SIZE(video_pll1_bypass_sels), CLK_SET_RATE_PARENT);
+ 	clks[IMX8MM_DRAM_PLL_BYPASS] = imx_clk_mux_flags("dram_pll_bypass", base + 0x50, 4, 1, dram_pll_bypass_sels, ARRAY_SIZE(dram_pll_bypass_sels), CLK_SET_RATE_PARENT);
+ 	clks[IMX8MM_GPU_PLL_BYPASS] = imx_clk_mux_flags("gpu_pll_bypass", base + 0x64, 4, 1, gpu_pll_bypass_sels, ARRAY_SIZE(gpu_pll_bypass_sels), CLK_SET_RATE_PARENT);
+@@ -485,8 +485,8 @@ static void __init imx8mm_clocks_init(struct device_node *ccm_node)
+ 	clks[IMX8MM_SYS_PLL3_BYPASS] = imx_clk_mux_flags("sys_pll3_bypass", base + 0x114, 4, 1, sys_pll3_bypass_sels, ARRAY_SIZE(sys_pll3_bypass_sels), CLK_SET_RATE_PARENT);
+ 
+ 	/* unbypass all the plls */
+-	clk_set_parent(clks[IMX8MM_AUDIO_PLL1_BYPASS], clks[IMX8MM_AUDIO_PLL1]);
+-	clk_set_parent(clks[IMX8MM_AUDIO_PLL2_BYPASS], clks[IMX8MM_AUDIO_PLL2]);
++//	clk_set_parent(clks[IMX8MM_AUDIO_PLL1_BYPASS], clks[IMX8MM_AUDIO_PLL1]);
++//	clk_set_parent(clks[IMX8MM_AUDIO_PLL2_BYPASS], clks[IMX8MM_AUDIO_PLL2]);
+ 	clk_set_parent(clks[IMX8MM_VIDEO_PLL1_BYPASS], clks[IMX8MM_VIDEO_PLL1]);
+ 	clk_set_parent(clks[IMX8MM_DRAM_PLL_BYPASS], clks[IMX8MM_DRAM_PLL]);
+ 	clk_set_parent(clks[IMX8MM_GPU_PLL_BYPASS], clks[IMX8MM_GPU_PLL]);
+@@ -497,8 +497,8 @@ static void __init imx8mm_clocks_init(struct device_node *ccm_node)
+ 	clk_set_parent(clks[IMX8MM_SYS_PLL3_BYPASS], clks[IMX8MM_SYS_PLL3]);
+ 
+ 	/* PLL out gate */
+-	clks[IMX8MM_AUDIO_PLL1_OUT] = imx_clk_gate("audio_pll1_out", "audio_pll1_bypass", base, 13);
+-	clks[IMX8MM_AUDIO_PLL2_OUT] = imx_clk_gate("audio_pll2_out", "audio_pll2_bypass", base + 0x14, 13);
++//	clks[IMX8MM_AUDIO_PLL1_OUT] = imx_clk_gate("audio_pll1_out", "audio_pll1_bypass", base, 13);
++//	clks[IMX8MM_AUDIO_PLL2_OUT] = imx_clk_gate("audio_pll2_out", "audio_pll2_bypass", base + 0x14, 13);
+ 	clks[IMX8MM_VIDEO_PLL1_OUT] = imx_clk_gate("video_pll1_out", "video_pll1_bypass", base + 0x28, 13);
+ 	clks[IMX8MM_DRAM_PLL_OUT] = imx_clk_gate("dram_pll_out", "dram_pll_bypass", base + 0x50, 13);
+ 	clks[IMX8MM_GPU_PLL_OUT] = imx_clk_gate("gpu_pll_out", "gpu_pll_bypass", base + 0x64, 13);
+@@ -535,18 +535,18 @@ static void __init imx8mm_clocks_init(struct device_node *ccm_node)
+ 
+ 	/* Core Slice */
+ 	clks[IMX8MM_CLK_A53_SRC] = imx_clk_mux2("arm_a53_src", base + 0x8000, 24, 3, imx8mm_a53_sels, ARRAY_SIZE(imx8mm_a53_sels));
+-	clks[IMX8MM_CLK_M4_SRC] = imx_clk_mux2("arm_m4_src", base + 0x8080, 24, 3, imx8mm_m4_sels, ARRAY_SIZE(imx8mm_m4_sels));
++//	clks[IMX8MM_CLK_M4_SRC] = imx_clk_mux2("arm_m4_src", base + 0x8080, 24, 3, imx8mm_m4_sels, ARRAY_SIZE(imx8mm_m4_sels));
+ 	clks[IMX8MM_CLK_VPU_SRC] = imx_clk_mux2("vpu_src", base + 0x8100, 24, 3, imx8mm_vpu_sels, ARRAY_SIZE(imx8mm_vpu_sels));
+ 	clks[IMX8MM_CLK_GPU3D_SRC] = imx_clk_mux2("gpu3d_src", base + 0x8180, 24, 3,  imx8mm_gpu3d_sels, ARRAY_SIZE(imx8mm_gpu3d_sels));
+ 	clks[IMX8MM_CLK_GPU2D_SRC] = imx_clk_mux2("gpu2d_src", base + 0x8200, 24, 3, imx8mm_gpu2d_sels,  ARRAY_SIZE(imx8mm_gpu2d_sels));
+ 	clks[IMX8MM_CLK_A53_CG] = imx_clk_gate3("arm_a53_cg", "arm_a53_src", base + 0x8000, 28);
+-	clks[IMX8MM_CLK_M4_CG] = imx_clk_gate3("arm_m4_cg", "arm_m4_src", base + 0x8080, 28);
++//	clks[IMX8MM_CLK_M4_CG] = imx_clk_gate3("arm_m4_cg", "arm_m4_src", base + 0x8080, 28);
+ 	clks[IMX8MM_CLK_VPU_CG] = imx_clk_gate3("vpu_cg", "vpu_src", base + 0x8100, 28);
+ 	clks[IMX8MM_CLK_GPU3D_CG] = imx_clk_gate3("gpu3d_cg", "gpu3d_src", base + 0x8180, 28);
+ 	clks[IMX8MM_CLK_GPU2D_CG] = imx_clk_gate3("gpu2d_cg", "gpu2d_src", base + 0x8200, 28);
+ 
+ 	clks[IMX8MM_CLK_A53_DIV] = imx_clk_divider2("arm_a53_div", "arm_a53_cg", base + 0x8000, 0, 3);
+-	clks[IMX8MM_CLK_M4_DIV] = imx_clk_divider2("arm_m4_div", "arm_m4_cg", base + 0x8080, 0, 3);
++//	clks[IMX8MM_CLK_M4_DIV] = imx_clk_divider2("arm_m4_div", "arm_m4_cg", base + 0x8080, 0, 3);
+ 	clks[IMX8MM_CLK_VPU_DIV] = imx_clk_divider2("vpu_div", "vpu_cg", base + 0x8100, 0, 3);
+ 	clks[IMX8MM_CLK_GPU3D_DIV] = imx_clk_divider2("gpu3d_div", "gpu3d_cg", base + 0x8180, 0, 3);
+ 	clks[IMX8MM_CLK_GPU2D_DIV] = imx_clk_divider2("gpu2d_div", "gpu2d_cg", base + 0x8200, 0, 3);
+@@ -606,17 +606,17 @@ static void __init imx8mm_clocks_init(struct device_node *ccm_node)
+ 
+ 	/* AHB */
+ 	clks[IMX8MM_CLK_AHB_SRC] = imx_clk_mux2("ahb_src", base + 0x9000, 24, 3, imx8mm_ahb_sels, ARRAY_SIZE(imx8mm_ahb_sels));
+-	clks[IMX8MM_CLK_AUDIO_AHB_SRC] = imx_clk_mux2("audio_ahb_src", base + 0x9100, 24, 3, imx8mm_audio_ahb_sels, ARRAY_SIZE(imx8mm_audio_ahb_sels));
++//	clks[IMX8MM_CLK_AUDIO_AHB_SRC] = imx_clk_mux2("audio_ahb_src", base + 0x9100, 24, 3, imx8mm_audio_ahb_sels, ARRAY_SIZE(imx8mm_audio_ahb_sels));
+ 	clks[IMX8MM_CLK_AHB_CG] = imx_clk_gate3("ahb_cg", "ahb_src", base + 0x9000, 28);
+-	clks[IMX8MM_CLK_AUDIO_AHB_CG] = imx_clk_gate3("audio_ahb_cg", "audio_ahb_src", base + 0x9100, 28);
++//	clks[IMX8MM_CLK_AUDIO_AHB_CG] = imx_clk_gate3("audio_ahb_cg", "audio_ahb_src", base + 0x9100, 28);
+ 	clks[IMX8MM_CLK_AHB_PRE_DIV] = imx_clk_divider2("ahb_pre_div", "ahb_cg", base + 0x9000, 16, 3);
+-	clks[IMX8MM_CLK_AUDIO_AHB_PRE_DIV] = imx_clk_divider2("audio_ahb_pre_div", "audio_ahb_cg", base + 0x9100, 16, 3);
++//	clks[IMX8MM_CLK_AUDIO_AHB_PRE_DIV] = imx_clk_divider2("audio_ahb_pre_div", "audio_ahb_cg", base + 0x9100, 16, 3);
+ 	clks[IMX8MM_CLK_AHB_DIV] = imx_clk_divider_flags("ahb_div", "ahb_pre_div", base + 0x9000, 0, 6, CLK_SET_RATE_PARENT | CLK_OPS_PARENT_ENABLE);
+-	clks[IMX8MM_CLK_AUDIO_AHB_DIV] = imx_clk_divider2("audio_ahb_div", "audio_ahb_pre_div", base + 0x9100, 0, 6);
++//	clks[IMX8MM_CLK_AUDIO_AHB_DIV] = imx_clk_divider2("audio_ahb_div", "audio_ahb_pre_div", base + 0x9100, 0, 6);
+ 
+ 	/* IPG */
+-	clks[IMX8MM_CLK_IPG_ROOT] = imx_clk_divider2("ipg_root", "ahb_div", base + 0x9080, 0, 1);
+-	clks[IMX8MM_CLK_IPG_AUDIO_ROOT] = imx_clk_divider2("ipg_audio_root", "audio_ahb_div", base + 0x9180, 0, 1);
++//	clks[IMX8MM_CLK_IPG_ROOT] = imx_clk_divider2("ipg_root", "ahb_div", base + 0x9080, 0, 1);
++//	clks[IMX8MM_CLK_IPG_AUDIO_ROOT] = imx_clk_divider2("ipg_audio_root", "audio_ahb_div", base + 0x9180, 0, 1);
+ 
+ 	/* IP */
+ 	clks[IMX8MM_CLK_DRAM_ALT_SRC] = imx_clk_mux2("dram_alt_src", base + 0xa000, 24, 3, imx8mm_dram_alt_sels, ARRAY_SIZE(imx8mm_dram_alt_sels));
+@@ -632,7 +632,7 @@ static void __init imx8mm_clocks_init(struct device_node *ccm_node)
+ 	clks[IMX8MM_CLK_LCDIF_PIXEL_SRC] = imx_clk_mux2("lcdif_pixel_src", base + 0xa500, 24, 3, imx8mm_lcdif_pixel_sels, ARRAY_SIZE(imx8mm_lcdif_pixel_sels));
+ 	clks[IMX8MM_CLK_SAI1_SRC] = imx_clk_mux2("sai1_src", base + 0xa580, 24, 3, imx8mm_sai1_sels, ARRAY_SIZE(imx8mm_sai1_sels));
+ 	clks[IMX8MM_CLK_SAI2_SRC] = imx_clk_mux2("sai2_src", base + 0xa600, 24, 3, imx8mm_sai2_sels, ARRAY_SIZE(imx8mm_sai2_sels));
+-	clks[IMX8MM_CLK_SAI3_SRC] = imx_clk_mux2("sai3_src", base + 0xa680, 24, 3, imx8mm_sai3_sels, ARRAY_SIZE(imx8mm_sai3_sels));
++//	clks[IMX8MM_CLK_SAI3_SRC] = imx_clk_mux2("sai3_src", base + 0xa680, 24, 3, imx8mm_sai3_sels, ARRAY_SIZE(imx8mm_sai3_sels));
+ 	clks[IMX8MM_CLK_SAI4_SRC] = imx_clk_mux2("sai4_src", base + 0xa700, 24, 3, imx8mm_sai4_sels, ARRAY_SIZE(imx8mm_sai4_sels));
+ 	clks[IMX8MM_CLK_SAI5_SRC] = imx_clk_mux2("sai5_src", base + 0xa780, 24, 3, imx8mm_sai5_sels, ARRAY_SIZE(imx8mm_sai5_sels));
+ 	clks[IMX8MM_CLK_SAI6_SRC] = imx_clk_mux2("sai6_src", base + 0xa800, 24, 3, imx8mm_sai6_sels, ARRAY_SIZE(imx8mm_sai6_sels));
+@@ -695,7 +695,7 @@ static void __init imx8mm_clocks_init(struct device_node *ccm_node)
+ 	clks[IMX8MM_CLK_LCDIF_PIXEL_CG] = imx_clk_gate3("lcdif_pixel_cg", "lcdif_pixel_src", base + 0xa500, 28);
+ 	clks[IMX8MM_CLK_SAI1_CG] = imx_clk_gate3("sai1_cg", "sai1_src", base + 0xa580, 28);
+ 	clks[IMX8MM_CLK_SAI2_CG] = imx_clk_gate3("sai2_cg", "sai2_src", base + 0xa600, 28);
+-	clks[IMX8MM_CLK_SAI3_CG] = imx_clk_gate3("sai3_cg", "sai3_src", base + 0xa680, 28);
++//	clks[IMX8MM_CLK_SAI3_CG] = imx_clk_gate3("sai3_cg", "sai3_src", base + 0xa680, 28);
+ 	clks[IMX8MM_CLK_SAI4_CG] = imx_clk_gate3("sai4_cg", "sai4_src", base + 0xa700, 28);
+ 	clks[IMX8MM_CLK_SAI5_CG] = imx_clk_gate3("sai5_cg", "sai5_src", base + 0xa780, 28);
+ 	clks[IMX8MM_CLK_SAI6_CG] = imx_clk_gate3("sai6_cg", "sai6_src", base + 0xa800, 28);
+@@ -758,7 +758,7 @@ static void __init imx8mm_clocks_init(struct device_node *ccm_node)
+ 	clks[IMX8MM_CLK_LCDIF_PIXEL_PRE_DIV] = imx_clk_divider2("lcdif_pixel_pre_div", "lcdif_pixel_cg", base + 0xa500, 16, 3);
+ 	clks[IMX8MM_CLK_SAI1_PRE_DIV] = imx_clk_divider2("sai1_pre_div", "sai1_cg", base + 0xa580, 16, 3);
+ 	clks[IMX8MM_CLK_SAI2_PRE_DIV] = imx_clk_divider2("sai2_pre_div", "sai2_cg", base + 0xa600, 16, 3);
+-	clks[IMX8MM_CLK_SAI3_PRE_DIV] = imx_clk_divider2("sai3_pre_div", "sai3_cg", base + 0xa680, 16, 3);
++//	clks[IMX8MM_CLK_SAI3_PRE_DIV] = imx_clk_divider2("sai3_pre_div", "sai3_cg", base + 0xa680, 16, 3);
+ 	clks[IMX8MM_CLK_SAI4_PRE_DIV] = imx_clk_divider2("sai4_pre_div", "sai4_cg", base + 0xa700, 16, 3);
+ 	clks[IMX8MM_CLK_SAI5_PRE_DIV] = imx_clk_divider2("sai5_pre_div", "sai5_cg", base + 0xa780, 16, 3);
+ 	clks[IMX8MM_CLK_SAI6_PRE_DIV] = imx_clk_divider2("sai6_pre_div", "sai6_cg", base + 0xa800, 16, 3);
+@@ -821,7 +821,7 @@ static void __init imx8mm_clocks_init(struct device_node *ccm_node)
+ 	clks[IMX8MM_CLK_LCDIF_PIXEL_DIV] = imx_clk_divider2("lcdif_pixel_div", "lcdif_pixel_pre_div", base + 0xa500, 0, 6);
+ 	clks[IMX8MM_CLK_SAI1_DIV] = imx_clk_divider2("sai1_div", "sai1_pre_div", base + 0xa580, 0, 6);
+ 	clks[IMX8MM_CLK_SAI2_DIV] = imx_clk_divider2("sai2_div", "sai2_pre_div", base + 0xa600, 0, 6);
+-	clks[IMX8MM_CLK_SAI3_DIV] = imx_clk_divider2("sai3_div", "sai3_pre_div", base + 0xa680, 0, 6);
++//	clks[IMX8MM_CLK_SAI3_DIV] = imx_clk_divider2("sai3_div", "sai3_pre_div", base + 0xa680, 0, 6);
+ 	clks[IMX8MM_CLK_SAI4_DIV] = imx_clk_divider2("sai4_div", "sai4_pre_div", base + 0xa700, 0, 6);
+ 	clks[IMX8MM_CLK_SAI5_DIV] = imx_clk_divider2("sai5_div", "sai5_pre_div", base + 0xa780, 0, 6);
+ 	clks[IMX8MM_CLK_SAI6_DIV] = imx_clk_divider2("sai6_div", "sai6_pre_div", base + 0xa800, 0, 6);
+@@ -895,8 +895,8 @@ static void __init imx8mm_clocks_init(struct device_node *ccm_node)
+ 	clks[IMX8MM_CLK_SAI1_IPG] = imx_clk_gate2_shared2("sai1_ipg_clk", "ipg_audio_root", base + 0x4330, 0, &share_count_sai1);
+ 	clks[IMX8MM_CLK_SAI2_ROOT] = imx_clk_gate2_shared2("sai2_root_clk", "sai2_div", base + 0x4340, 0, &share_count_sai2);
+ 	clks[IMX8MM_CLK_SAI2_IPG] = imx_clk_gate2_shared2("sai2_ipg_clk", "ipg_audio_root", base + 0x4340, 0, &share_count_sai2);
+-	clks[IMX8MM_CLK_SAI3_ROOT] = imx_clk_gate2_shared2("sai3_root_clk", "sai3_div", base + 0x4350, 0, &share_count_sai3);
+-	clks[IMX8MM_CLK_SAI3_IPG] = imx_clk_gate2_shared2("sai3_ipg_clk", "ipg_audio_root", base + 0x4350, 0, &share_count_sai3);
++//	clks[IMX8MM_CLK_SAI3_ROOT] = imx_clk_gate2_shared2("sai3_root_clk", "sai3_div", base + 0x4350, 0, &share_count_sai3);
++//	clks[IMX8MM_CLK_SAI3_IPG] = imx_clk_gate2_shared2("sai3_ipg_clk", "ipg_audio_root", base + 0x4350, 0, &share_count_sai3);
+ 	clks[IMX8MM_CLK_SAI4_ROOT] = imx_clk_gate2_shared2("sai4_root_clk", "sai4_div", base + 0x4360, 0, &share_count_sai4);
+ 	clks[IMX8MM_CLK_SAI4_IPG] = imx_clk_gate2_shared2("sai4_ipg_clk", "ipg_audio_root", base + 0x4360, 0, &share_count_sai4);
+ 	clks[IMX8MM_CLK_SAI5_ROOT] = imx_clk_gate2_shared2("sai5_root_clk", "sai5_div", base + 0x4370, 0, &share_count_sai5);
+diff --git a/drivers/rpmsg/imx_rpmsg_pingpong.c b/drivers/rpmsg/imx_rpmsg_pingpong.c
+old mode 100644
+new mode 100755
+index 3aa545f..ee18f16
+--- a/drivers/rpmsg/imx_rpmsg_pingpong.c
++++ b/drivers/rpmsg/imx_rpmsg_pingpong.c
+@@ -16,10 +16,22 @@
+ #include <linux/module.h>
+ #include <linux/virtio.h>
+ #include <linux/rpmsg.h>
++#include <linux/cdev.h>
+ 
+ #define MSG		"hello world!"
+ static unsigned int rpmsg_pingpong;
+ 
++static char KW_SPOTTED[] = "Y";
++static char NO_KW_SPOTTED[] = "N";
++static const ssize_t MAX_BUFF_LEN = sizeof(KW_SPOTTED);
++volatile bool kw_spotted_flag = false;
++//static char response_buffer[MAX_BUFF_LEN];
++
++#define DEVICE_NAME "eIQDemo_Dev" // Dev name as it appears in /proc/devices
++dev_t dev = 0;
++static struct cdev my_cdev;
++static struct class *my_dev_class;
++
+ static int rpmsg_pingpong_cb(struct rpmsg_device *rpdev, void *data, int len,
+ 						void *priv, u32 src)
+ {
+@@ -27,18 +39,21 @@ static int rpmsg_pingpong_cb(struct rpmsg_device *rpdev, void *data, int len,
+ 
+ 	/* reply */
+ 	rpmsg_pingpong = *(unsigned int *)data;
+-	pr_info("get %d (src: 0x%x)\n", rpmsg_pingpong, src);
++	//pr_info("***   get %d (src: 0x%x)\n", rpmsg_pingpong, src);
+ 
+ 	/* pingpongs should not live forever */
+-	if (rpmsg_pingpong > 100) {
+-		dev_info(&rpdev->dev, "goodbye!\n");
+-		return 0;
+-	}
++	//if (rpmsg_pingpong > 100) {
++	//	dev_info(&rpdev->dev, "goodbye!\n");
++	//	return 0;
++	//}
+ 	rpmsg_pingpong++;
+ 	err = rpmsg_sendto(rpdev->ept, (void *)(&rpmsg_pingpong), 4, src);
+ 
+ 	if (err)
+-		dev_err(&rpdev->dev, "rpmsg_send failed: %d\n", err);
++		dev_err(&rpdev->dev, "***   rpmsg_send failed: %d\n", err);
++
++    kw_spotted_flag = true;
++    dev_err(&rpdev->dev, "***   got PONG <=> KW spotted \n");
+ 
+ 	return err;
+ }
+@@ -47,7 +62,7 @@ static int rpmsg_pingpong_probe(struct rpmsg_device *rpdev)
+ {
+ 	int err;
+ 
+-	dev_info(&rpdev->dev, "new channel: 0x%x -> 0x%x!\n",
++	dev_info(&rpdev->dev, "***   new channel: 0x%x -> 0x%x!\n",
+ 			rpdev->src, rpdev->dst);
+ 
+ 	/*
+@@ -56,14 +71,14 @@ static int rpmsg_pingpong_probe(struct rpmsg_device *rpdev)
+ 	 */
+ 	err = rpmsg_send(rpdev->ept, MSG, strlen(MSG));
+ 	if (err) {
+-		dev_err(&rpdev->dev, "rpmsg_send failed: %d\n", err);
++		dev_err(&rpdev->dev, "***   rpmsg_send failed: %d\n", err);
+ 		return err;
+ 	}
+ 
+ 	rpmsg_pingpong = 0;
+ 	err = rpmsg_sendto(rpdev->ept, (void *)(&rpmsg_pingpong), 4, rpdev->dst);
+ 	if (err) {
+-		dev_err(&rpdev->dev, "rpmsg_send failed: %d\n", err);
++		dev_err(&rpdev->dev, "***   rpmsg_send failed: %d\n", err);
+ 		return err;
+ 	}
+ 
+@@ -72,7 +87,7 @@ static int rpmsg_pingpong_probe(struct rpmsg_device *rpdev)
+ 
+ static void rpmsg_pingpong_remove(struct rpmsg_device *rpdev)
+ {
+-	dev_info(&rpdev->dev, "rpmsg pingpong driver is removed\n");
++	dev_info(&rpdev->dev, "***   rpmsg pingpong driver is removed\n");
+ }
+ 
+ static struct rpmsg_device_id rpmsg_driver_pingpong_id_table[] = {
+@@ -91,13 +106,132 @@ static struct rpmsg_driver rpmsg_pingpong_driver = {
+ 	.remove		= rpmsg_pingpong_remove,
+ };
+ 
++ssize_t my_file_read(struct file *file_ptr,
++                        char __user *user_buffer, // The buffer to fill with data
++                        size_t count,             // The length of the buffer
++                        loff_t *position)         // Our offset in the file
++{
++     //pr_err("   *** [my_file_read]: Device file is read at offset = %i, read bytes count = %u", (int)*position, (unsigned int)count);
++    /* If position is behind the end of a file we have nothing to read */
++    if (*position >= MAX_BUFF_LEN) {
++        //pr_err("   *** [my_file_read]: *position >= MAX_BUFF_LEN; nothing to read");
++        kw_spotted_flag = false;
++        return 0;
++    }
++    /* If a user tries to read more than we have, read only as many bytes as we have */
++    if (*position + count > MAX_BUFF_LEN) {
++        count = MAX_BUFF_LEN - *position;
++        //pr_info("   *** [my_file_read]: trunc count to %u\n", (unsigned int)count);
++    }
++
++    if (kw_spotted_flag) {
++        if (copy_to_user(user_buffer, KW_SPOTTED + *position, count) != 0) {
++            kw_spotted_flag = false;
++            return -EFAULT;
++        }
++    }
++    else {
++        if (copy_to_user(user_buffer, NO_KW_SPOTTED + *position, count) != 0) {
++            kw_spotted_flag = false;
++            return -EFAULT;
++        }
++    }
++    /* Move reading position */
++    *position += count;
++    //pr_info("   *** [my_file_read]: trunc count to %u\n", (unsigned int)count);
++    //pr_info("   *** [my_file_read]: move read ptr to offset %i", (int)*position);
++    kw_spotted_flag = false;
++    return count;
++
++}
++
++/*  Called when a process writes to dev file: echo "hi" > /dev/hello */
++static ssize_t my_file_write(struct file *filp,
++   const char *buff,
++   size_t len,
++   loff_t *off)
++{
++   printk ("    ***[device_write]: NOT SUPPORTED.\n");
++   return -EINVAL;
++}
++
++/* Called when a process tries to open the device file, like
++ * "cat /dev/mycharfile"
++ */
++static int my_device_open(struct inode *inode, struct file *file)
++{
++   //pr_err("   ***[my_device_open]");
++
++   return 0;
++}
++
++
++/* Called when a process closes the device file */
++static int my_device_release(struct inode *inode, struct file *file)
++{
++   //pr_err("   ***[my_device_release]");
++
++   return 0;
++}
++
++// undefined functions are set to NULL
++struct file_operations my_file_operations = {
++	.owner = THIS_MODULE,
++	.read  = my_file_read,
++    .write  = my_file_write,
++    .open = my_device_open,
++    .release = my_device_release
++	//.unlocked_ioctl = my_device_ioctl,
++};
++
+ static int __init init(void)
+ {
+-	return register_rpmsg_driver(&rpmsg_pingpong_driver);
++    //register_chrdev(MAJOR, DEVICE_NAME, &my_file_operations);
++    /*Allocating Major number*/
++    if((alloc_chrdev_region(&dev, 0 /* first minor */, 1 /* count */, DEVICE_NAME)) < 0){
++            printk(KERN_INFO "***   Cannot allocate major number\n");
++            return -1;
++    }
++    printk(KERN_INFO "***   Major = %d Minor = %d \n",MAJOR(dev), MINOR(dev));
++
++    /*Creating cdev structure*/
++    cdev_init(&my_cdev, &my_file_operations);
++
++    /*Adding character device to the system*/
++    if((cdev_add(&my_cdev, dev, 1)) < 0){
++        printk(KERN_INFO "***   Cannot add the device to the system\n");
++        goto r_class;
++    }
++
++    /*Creating struct class*/
++    if((my_dev_class = class_create(THIS_MODULE, "eIQDemo_class")) == NULL){
++        printk(KERN_INFO "***   Cannot create the struct class\n");
++        goto r_class;
++    }
++
++    /*Creating device*/
++    if((device_create(my_dev_class, NULL, dev, NULL, "eIQDemo_device")) == NULL){
++        printk(KERN_INFO "***   Cannot create the Device 1\n");
++        goto r_device;
++    }
++
++    printk(KERN_INFO "***   Device Driver Insert...Done!!!\n");
++    return register_rpmsg_driver(&rpmsg_pingpong_driver);
++
++r_device:
++        class_destroy(my_dev_class);
++r_class:
++        unregister_chrdev_region(dev,1);
++        return -1;
++
+ }
+ 
+ static void __exit fini(void)
+ {
++    //pr_err("***    [fini]");
++    device_destroy(my_dev_class,dev);
++    class_destroy(my_dev_class);
++    cdev_del(&my_cdev);
+ 	unregister_rpmsg_driver(&rpmsg_pingpong_driver);
+ }
+ module_init(init);

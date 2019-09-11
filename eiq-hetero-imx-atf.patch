@@ -1,0 +1,24 @@
+diff --git a/plat/imx/imx8mm/gpc.c b/plat/imx/imx8mm/gpc.c
+old mode 100644
+new mode 100755
+index 4c434c4..cfd817a
+--- a/plat/imx/imx8mm/gpc.c
++++ b/plat/imx/imx8mm/gpc.c
+@@ -419,7 +419,7 @@ void imx_set_cluster_powerdown(int last_core, uint8_t power_state)
+ 		val = mmio_read_32(IMX_GPC_BASE + LPCR_A53_BSC);
+ 		val |= LPM_MODE(power_state); /* enable the C0~1 LPM */
+ 		val &= ~A53_CLK_ON_LPM;
+-		mmio_write_32(IMX_GPC_BASE + LPCR_A53_BSC, val);
++		//mmio_write_32(IMX_GPC_BASE + LPCR_A53_BSC, val);
+ 
+ 		/* enable C2-3's LPM */
+ 		val = mmio_read_32(IMX_GPC_BASE + LPCR_A53_BSC2);
+@@ -448,7 +448,7 @@ void imx_set_cluster_powerdown(int last_core, uint8_t power_state)
+ 		val = mmio_read_32(IMX_GPC_BASE + LPCR_A53_BSC);
+ 		val &= ~0xf; /* clear the C0~1 LPM */
+ 		val |= A53_CLK_ON_LPM;
+-		mmio_write_32(IMX_GPC_BASE + LPCR_A53_BSC, val);
++		//mmio_write_32(IMX_GPC_BASE + LPCR_A53_BSC, val);
+ 
+ 		val = mmio_read_32(IMX_GPC_BASE + LPCR_A53_BSC2);
+ 		val &= ~0xf;

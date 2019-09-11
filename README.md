@@ -38,7 +38,7 @@ $: insmod imx_rpmsg_pingpong.ko
 ```
 ##### First time only
 ```bash
-$: cd ~/eIQ-hetero
+$: cd ~/eiq-hetero
 $: python3 wrap_migrate.py
 $: python3 wrap_createsuperuser.py
 ```
@@ -65,11 +65,11 @@ $: repo init -u https://source.codeaurora.org/external/imx/imx-manifest -b imx-l
 $: repo sync
 $: EULA=1 MACHINE=imx8mmevk DISTRO=fsl-imx-xwayland source ./fsl-setup-release.sh -b bld-xwayland
 ```
-2. Clone **meta-eIQ-hetero** demo layer in **${BSPDIR}/sources/**
-3. Add eIQ and demo layers. Add the following line into ${BSPDIR}/sources/base/conf/bblayers.conf:
+2. Clone **meta-eiq-hetero** demo layer in **${BSPDIR}/sources/**
+3. Add eIQ and demo layers. Add the following line into conf/bblayers.conf:
 ```
 BBLAYERS += " ${BSPDIR}/sources/meta-imx-machinelearning "
-BBLAYERS += " ${BSPDIR}/sources/meta-eIQ-hetero "
+BBLAYERS += " ${BSPDIR}/sources/meta-eiq-hetero "
 ```
 4. Enable eIQ and other dependencies. Add the following lines into conf/local.conf:
 ```
@@ -100,15 +100,15 @@ IMAGE_ROOTFS_EXTRA_SPACE = "20971520"
 ```
 5. Bake the image:
 ```bash
-$: bitbake image-eIQ-hetero
+$: bitbake image-eiq-hetero
 ```
 
 6. Apply patches:
 ```bash
 $: cd ${BSPDIR}/bld-xwayland/tmp/work-shared/imx8mmlpddr4evk/kernel-source
-$: git apply eIQ-hetero-linux-imx.patch
+$: git apply eiq-hetero-linux-imx.patch
 $: cd ${BSPDIR}/bld-xwayland/tmp/work/imx8mmddr4evk-poky-linux/imx-atf/2.0+gitAUTOINC+1cb68fa0a0-r0/git 
-$: git apply eIQ-hetero-imx-atf.patch
+$: git apply eiq-hetero-imx-atf.patch
 ```
 - Rebuild kernel: ```$: bitbake linux-imx```
 - Rebuild ATF: ```$: bitbake imx-atf```
