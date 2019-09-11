@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Mobile lock screen pin code</title>
+
+  <link rel="stylesheet" href="static/css/style-pin.css">
+
+</head>
+
+<body>
+
+  <div id="pincode">
+    <div>
+      <p style="font-size:300%;">
+        <strong>eIQ Heterogenous Demo using Cortex-A and Cortex-M cores</strong>
+      </p>
+    </div>
+
+	  <div class="table">
+        <div class="cell">
+            <div id="kws">
+              <p style="font-size:300%;">
+                  <strong>Say "GO" to try key word spotting</strong>
+              </p>
+            </div>
+                <img src="{% url 'generate' %}">
+            <div id="anleitung">
+              <p style="font-size:300%;">
+                <strong>Try Face Recognition</strong>
+              </p>
+            </div>
+
+
+            <div id="numbers">
+              <div class="grid">
+
+                <div id="face_recognition"><button><img src="static/img/icons/1x/outline_face_white_48dp.png"></button></div>
+                <div id="sleep_btn"><button><b>SLEEP</b></button></div>
+
+              </div>
+            </div>
+
+        </div>
+    </div>
+  </div>    
+
+  <script src='static/js/jquery-3.3.1.min.js'></script>
+  
+  <!-- _BOARD_IP.js must be specified BEFORE all scripts that
+  need to know the IP (currently pin-pad.js and dashboard.js -->
+  <script src='static/js/_BOARD_IP.js'></script>
+  <script src="static/js/pin-pad.js"></script>
+</body>
+
+<footer>&copy; Copyright 2019, NXP Semiconductors HTML.am</footer>
+
+</html>

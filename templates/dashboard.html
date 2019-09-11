@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Material Design Bootstrap</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Bootstrap core CSS -->
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="static/css/mdb.min.css" rel="stylesheet">
+    <!-- Your custom styles (optional) -->
+    <link href="static/css/style.css" rel="stylesheet">
+    <!-- Loader widget to show while data is trained -->
+    <link href="static/css/style-loader.css" rel="stylesheet">
+</head>
+
+<body class="grey lighten-3">
+
+    <!--Main Navigation-->
+    <header>
+
+        <!-- Navbar -->
+        <nav class="navbar fixed-top navbar-expand-lg navbar-light white scrolling-navbar">
+            <div class="container-fluid">
+
+                <!-- Brand -->
+                <a class="navbar-brand waves-effect" href="#" target="_blank">
+                    <strong class="blue-text">&copy; 2019 NXP Semiconductors</strong>
+                </a>
+
+                <!-- Collapse -->
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+            </div>
+        </nav>
+        <!-- Navbar -->
+    </header>
+    <!--Main Navigation-->
+
+    <!--Main layout-->
+    <main class="pt-5 mx-lg-5">
+        <!--Add New User Modal-->
+        <div id="modalAddUserFormID" class="modal">
+                <span onclick="document.getElementById('modalAddUserFormID').style.display='none'" class="close" title="Close Modal">&times;</span>
+                <form class="modal-content" action="/action_page.php">
+                  <div class="container">
+                    <h1>Sign Up</h1>
+                    <p>Please fill in this form to create an account.</p>
+                    <hr>
+                    <label for="email"><b>Email</b></label>
+                    <input type="text" placeholder="Enter Email" name="email" required>
+
+                    <label for="psw"><b>Password</b></label>
+                    <input type="password" placeholder="Enter Password" name="psw" required>
+
+                    <label for="psw-repeat"><b>Repeat Password</b></label>
+                    <input type="password" placeholder="Repeat Password" name="psw-repeat" required>
+
+                    <label>
+                      <input type="checkbox" checked="checked" name="remember" style="margin-bottom:15px"> Remember me
+                    </label>
+
+                    <p>By creating an account you agree to our <a href="#" style="color:dodgerblue">Terms & Privacy</a>.</p>
+
+                    <div class="clearfix">
+                      <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+                      <button type="submit" class="signupbtn">Sign Up</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+        <!-- /.Add New User Modal-->
+
+        <!--
+            Dashboard page layout:
+            --------------------------------------------
+            |    IMG from camera    |    Add New User  |
+            --------------------------------------------
+            |                   USERS TABLE            |
+            --------------------------------------------
+            |                   LOGS TABLE             |
+            --------------------------------------------
+        -->
+        <div class="container-fluid mt-5">
+
+            <!-- First grid row-->
+            <div class="row wow fadeIn">
+                <!-- Row 1, column 1: IMG from camera  -->
+                <div class="col-md-6">
+                    <!-- Card -->
+                    <div class="card">
+                        <!--Card content-->
+                        <div class="card-body">
+                            <img class="img-fluid z-depth-1" src="{% url 'generate' %}">
+                        </div>
+                    </div> <!--/ Card -->
+                </div> <!--/ Row 1, column 1: IMG from camera  -->
+                <div class="col-md-6">
+                    <!-- Card -->
+                    <div class="card" style="width:100%;height:100%">
+                        <div class="card-header"><i class="fa fa-user-plus"></i><strong>  ADD NEW USER</strong> </div>
+                        <!--Card content-->
+                        <div class="card-body">
+                            <div class="row wow fadeIn" style="width:100%">
+                                <div class="col-md-4">
+                                    <label for="user-name">User Name:</label>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" id="user-name" name="firstname" placeholder="New User Name ..." style="width:100%;text-align:left">
+                                </div>
+                                <div class="col-md-2">
+                                    <button id="add-user-btn" button title="Add New User" alt="Add New User" class="btn btn-primary btn-sm float-right"><i class="fa fa-user-plus" fa-5x></i></button>
+                                </div>
+                            </div>
+                            <div class="row wow fadeIn pb-5">
+                                <div id="add-user-msg" style="display:none;">
+                                    <p><b>Please position yourself so that the camera detects your face!</b></p>
+                                </div>
+                            </div>
+
+                            <div class="row wow fadeIn">
+                                <div class="col-md-3">
+                                    <div class="row wow fadeIn">
+                                        <button id="take-snapshot-btn" button title="Take Snapshot" alt="Add New User" class="btn btn-primary btn-lg float-left" style="display:none;"><i class="fa fa-camera" fa-9x></i><br/>Take Snapshot<br/></button>
+                                    </div>
+                                    <div class="row wow fadeIn">
+                                        <button id="save-snapshot-btn" button title="Save Snapshot" class="btn btn-primary float-left" style="display:none; width:70%">Save Snapshot</button>
+                                    </div>
+
+
+                                </div>
+                                <div class="col-md-6" float-left>
+                                    <img id="user-snapshot-img" style="display:none;" width="320" height="240"></img>
+                                    <p id="user-snapshot-img-title"></p>
+                                </div>
+
+                            </div>
+                            <div class="row wow fadeIn">
+                                    <button id="cancel-adding-user-btn" button title="Cancel Adding User" class="btn btn-primary float-right" style="display:none; width:70%">Cancel Adding User</button>
+                            </div>
+                        </div> <!--/ Card Body-->
+                    </div> <!--/ Card -->
+                </div> <!--/ Row 1, column 2: ADD New User  -->
+
+            </div> <!--/ First grid row -->
+
+            <!-- <div class="row wow fadeIn">
+                <div  style="display:none;" id="loader-wheel"></div>
+            </div> -->
+
+            <div class="loader" style="display:none;" id="load-dots">
+              <div class="loadertext"> Training </div>
+              <div class="pair pair-1">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+              </div>
+              <div class="pair pair-2">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+              </div>
+            </div>
+
+            <!-- Second grid row-->
+            <div class="row wow fadeIn">
+                <!-- Column 2 from row 1: USERS  -->
+                <div class="col-md-12">
+                    <!-- Card -->
+                    <div class="card">
+                        <div class="card-header"><i class="fa fa-user"></i><strong> USERS</strong></div>
+                        <!-- Card content -->
+                        <div class="card-body">
+                            <!--Table Wrapper Scroll Y-->
+                            <div class="table-wrapper-scroll-y">
+                                <!-- Table  -->
+                                <table class="table">
+                                    <!-- Table body -->
+                                    <tbody id="users">
+                                    </tbody>
+                                    <!-- Table body -->
+                                </table>
+                                <!-- Table  -->
+                            </div>
+                            <!--/.Table Wrapper Scroll Y-->
+                        </div>
+                    </div> <!--/ Card -->
+                </div> <!--/ Column 2 from row 1: USERS  -->
+            </div> <!--/ Second grid row-->
+
+            <!-- Third grid row-->
+            <div class="row wow fadeIn">
+                <!--/ Row 3, column 1: ACCESS LOGS -->
+                <div class="col-md-12">
+                    <!-- Card -->
+                    <div class="card">
+                        <div class="card-header"><i class="fa fa-address-card"></i><strong> ACCESS LOGS</strong></div>
+                        <!-- Card content -->
+                        <div class="card-body">
+                        <!--Table Wrapper Scroll Y-->
+                        <div class="table-wrapper-scroll-y">
+                            <!-- Table  -->
+                            <table class="table">
+                                <!-- Table head -->
+                                <thead class="blue-grey lighten-4">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Picture</th>
+                                        <th>Timestamp</th>
+                                        <th>Attempt</th>
+                                    </tr>
+                                </thead>
+                                <!-- Table head -->
+
+                                <!-- Table body -->
+                                <tbody id="logs">
+                                </tbody>
+                                <!-- Table body -->
+                            </table>
+                            <!-- Table  -->
+                        </div>
+                        <!--/.Table Wrapper Scroll Y-->
+                            <!-- Button -->
+                        <button id="refresh-btn" class="btn btn-primary btn-lg float-right"><i class="fa fa-refresh fa-9x"></i> Refresh</button>
+                    </div> <!--/ Card -->
+                </div> <!--/ Row 2, column 2: ACCESS LOGS -->
+            </div> <!--/ Second grid row-->
+        </div> <!-- Container -->
+    </main> <!--Main layout-->
+
+    <!-- SCRIPTS -->
+    <!-- JQuery -->
+    <script type="text/javascript" src="static/js/jquery-3.3.1.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="static/js/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="static/js/mdb.min.js"></script>
+    <!-- Custom scripts -->
+    <!-- _BOARD_IP.js must be specified BEFORE all scripts that
+    need to know the IP (currently pin-pad.js and dashboard.js -->
+    <script src='static/js/_BOARD_IP.js'></script>
+    <script type="text/javascript" src="static/js/dashboard.js"></script>
+
+    <!-- Initializations -->
+    <script type="text/javascript">
+        // Animations initialization
+        new WOW().init();
+    </script>
+</body>
+
+</html>
