@@ -34,7 +34,7 @@ u-boot=>boot
 ##### Insert updated rpmsg driver located in $HOME foder:
 ```bash
 $: cd ~
-$: insmod imx_rpmsg_pingpong.ko
+$: modprobe imx_rpmsg_pingpong
 ```
 ##### First time only
 ```bash
