@@ -31,9 +31,8 @@ u-boot=>bootaux 0x80000000
 u-boot=>boot
 ```
 ### Start Face Recognition on Cortex-A:
-##### Insert updated rpmsg driver located in $HOME foder:
+##### Insert updated rpmsg driver:
 ```bash
-$: cd ~
 $: modprobe imx_rpmsg_pingpong
 ```
 ##### First time only
@@ -102,14 +101,3 @@ IMAGE_ROOTFS_EXTRA_SPACE = "20971520"
 ```bash
 $: bitbake image-eiq-hetero
 ```
-
-6. Apply patches:
-```bash
-$: cd ${BSPDIR}/bld-xwayland/tmp/work-shared/imx8mmlpddr4evk/kernel-source
-$: git apply eiq-hetero-linux-imx.patch
-$: cd ${BSPDIR}/bld-xwayland/tmp/work/imx8mmddr4evk-poky-linux/imx-atf/2.0+gitAUTOINC+1cb68fa0a0-r0/git 
-$: git apply eiq-hetero-imx-atf.patch
-```
-- Rebuild kernel: ```$: bitbake linux-imx```
-- Rebuild ATF: ```$: bitbake imx-atf```
-- Update sdcard image with the new binaries: kernel image (Image), rpmsg ping-pong driver (imx_rpmsg_pingpong.ko), i.MX8MMini DTB (fsl-imx8mm-evk.dtb) and atf (imx-boot-imx8mmevk-sd.bin-flash_evk).
