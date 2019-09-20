@@ -99,5 +99,5 @@ IMAGE_ROOTFS_EXTRA_SPACE = "20971520"
 ```
 5. Bake the image:
 ```bash
-$: bitbake image-eiq-heterogenous
+$: bitbake image-eiq-hetero
 ```
