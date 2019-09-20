@@ -37,7 +37,7 @@ $: modprobe imx_rpmsg_pingpong
 ```
 ##### First time only
 ```bash
-$: cd ~/eiq-hetero
+$: cd ~/eiq-heterogenous
 $: python3 wrap_migrate.py
 $: python3 wrap_createsuperuser.py
 ```
@@ -54,7 +54,7 @@ $: /opt/src/bin/src
 
 Build instructions
 ------------------
-### Yocto image with eIQ OpenCV and hetero demo layer
+### Yocto image with eIQ OpenCV and heterogenous demo layer
 **Requirements:** Ubuntu 16 Host PC 
 1. Project initialization
 ```bash
@@ -64,11 +64,11 @@ $: repo init -u https://source.codeaurora.org/external/imx/imx-manifest -b imx-l
 $: repo sync
 $: EULA=1 MACHINE=imx8mmevk DISTRO=fsl-imx-xwayland source ./fsl-setup-release.sh -b bld-xwayland
 ```
-2. Clone **meta-eiq-hetero** demo layer in **${BSPDIR}/sources/**
+2. Clone **meta-eiq-heterogenous** demo layer in **${BSPDIR}/sources/**
 3. Add eIQ and demo layers. Add the following line into conf/bblayers.conf:
 ```
 BBLAYERS += " ${BSPDIR}/sources/meta-imx-machinelearning "
-BBLAYERS += " ${BSPDIR}/sources/meta-eiq-hetero "
+BBLAYERS += " ${BSPDIR}/sources/meta-eiq-heterogenous "
 ```
 4. Enable eIQ and other dependencies. Add the following lines into conf/local.conf:
 ```
@@ -99,5 +99,5 @@ IMAGE_ROOTFS_EXTRA_SPACE = "20971520"
 ```
 5. Bake the image:
 ```bash
-$: bitbake image-eiq-hetero
+$: bitbake image-eiq-heterogenous
 ```
