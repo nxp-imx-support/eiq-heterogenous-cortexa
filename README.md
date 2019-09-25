@@ -37,7 +37,7 @@ $: modprobe imx_rpmsg_pingpong
 ```
 ##### First time only
 ```bash
-$: cd ~/eiq-heterogenous
+$: cd ~/eiq-heterogenous-cortexa
 $: python3 wrap_migrate.py
 $: python3 wrap_createsuperuser.py
 ```
