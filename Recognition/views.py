@@ -10,6 +10,7 @@ import shutil
 import os
 import subprocess
 import cv2
+import errno
 
 import logging
 # logger config is done in __init__ for each module
@@ -18,7 +19,6 @@ logger = logging.getLogger(__name__)
 class TemporaryWrapper(object):
     frame_containing_face = []
     frame_face_locations = []
-
 
 # Create your views here.
 def return_recognition(request):
@@ -144,7 +144,13 @@ def sleep(request):
     # Put Cortex-A in low power mode
     f = open("/sys/power/state", "w+")
     f.write("mem")
-    f.flush()  
+
+    # Do not remove 'f.close()'; it is necessary to force the write in order to enter the low power mode
+    try:
+        f.close()
+    except IOError as e:
+        if e.errno == errno.EWOULDBLOCK:
+            print('/sys/power/state:', os.strerror(errno.EWOULDBLOCK))
     
     logging.info("   >>> [sleep]: done. Send request to re-open the camera")    
     MultiProcessRecognizer.CPU_wake_request.set()
